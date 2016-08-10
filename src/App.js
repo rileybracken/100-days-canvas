@@ -13,19 +13,48 @@ class App extends Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize, false);
+    this.animate();
 
     this.setState({ width: window.innerWidth, height: window.innerHeight });
   }
 
-  componentDidUpdate() {
+  animate = () => {
+    requestAnimationFrame(this.animate);
+    this.draw();
+  }
+
+  draw = () => {
     const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
+    const halfHeight = this.state.height / 2;
+    const halfWidth = this.state.width / 2;
+    const quarterWidth = halfWidth / 2;
 
-    context.fillStyle = `rgba(200, 0, 0, 0.5)`;
-    context.fillRect(0, 0, this.state.width, this.state.height) ;
+    ctx.clearRect(0, 0, this.state.width, this.state.height);
 
-    context.fillStyle = `rgba(0, 0, 200, 0.5)`;
-    context.fillRect(20, 20, this.state.width - 40, this.state.height - 40);
+    // Outer circle
+    ctx.beginPath();
+    ctx.fillStyle = "rgb(0, 0, 0)";
+    ctx.arc(halfWidth, halfHeight, quarterWidth, 0, Math.PI * 2, true);
+    ctx.fill();
+
+    // Square
+    ctx.fillStyle = "rgba(250, 0, 0, 0.5)";
+    ctx.fillRect (halfWidth, halfHeight, halfWidth, 4);
+
+    // Rotate Context
+    ctx.translate(halfWidth, halfHeight);
+    ctx.rotate(Math.PI / 180);
+
+    // Draw Line
+    ctx.strokeStyle= "rgb(255, 255, 255)";
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(quarterWidth, 0);
+    ctx.stroke();
+
+    // Put Context back
+    ctx.translate(-halfWidth, -halfHeight);
   }
 
   componentWillUnmount() {
@@ -38,9 +67,7 @@ class App extends Component {
 
   render() {
     return (
-      <div>
-        <canvas id='canvas' width={ this.state.width } height={ this.state.height }></canvas>
-      </div>
+      <canvas id='canvas' width={ this.state.width } height={ this.state.height }></canvas>
     );
   }
 }
